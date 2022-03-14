@@ -1,0 +1,68 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Mon Mar 14 2022
+@author: Yeonju Chu
+"""
+#%%
+
+import os # for confirm your file directory 
+# os.getcwd()
+import io #save file
+import pandas as pd
+import requests as rq #url
+import time
+
+from bs4 import BeautifulSoup 
+from selenium import webdriver 
+from selenium.webdriver.common.keys import Keys
+
+# Load screen name list from file
+df_name = pd.read_csv('%%%.csv')
+name = [i for i in df_name.Label.values]
+#print(len(name)) # check number
+
+# scraping
+
+# log in 
+elem = driver.find_element_by_css_selector("#react-root > div > div > div > main > div > div > div > div.css-1dbjc4n.r-6koalj.r-16y2uox > div.css-1dbjc4n.r-16y2uox.r-1jgb5lz.r-13qz1uu > div.css-1dbjc4n.r-8w3o46.r-16y2uox.r-1wbh5a2.r-1dqxon3 > div > div > div.css-1dbjc4n.r-mk0yit.r-1f1sjgu.r-13qz1uu > label > div > div.css-1dbjc4n.r-18u37iz.r-16y2uox.r-1wbh5a2.r-1wzrnnt.r-1udh08x.r-xd6kpl.r-1pn2ns4.r-ttdzmv > div > input")
+elem.clear()
+
+email = input("Enter your email or username here: ")
+elem.send_keys(email)
+elem.send_keys(Keys.RETURN)
+
+elem = driver.find_element_by_css_selector("#react-root > div > div > div > main > div > div > div > div.css-1dbjc4n.r-6koalj.r-16y2uox > div.css-1dbjc4n.r-16y2uox.r-1jgb5lz.r-1ye8kvj.r-13qz1uu > div.css-1dbjc4n.r-8w3o46.r-16y2uox.r-1wbh5a2.r-1dqxon3 > div > div > div.css-1dbjc4n.r-mk0yit.r-13qz1uu > div > label > div > div.css-1dbjc4n.r-18u37iz.r-16y2uox.r-1wbh5a2.r-1wzrnnt.r-1udh08x.r-xd6kpl.r-1pn2ns4.r-ttdzmv > div.css-901oao.r-1awozwy.r-1fmj7o5.r-6koalj.r-1qd0xha.r-1inkyih.r-16dba41.r-135wba7.r-bcqeeo.r-13qz1uu.r-qvutc0 > input")
+elem.clear() #erase text
+password = input("Enter your password here: ")
+elem.send_keys(password)
+
+elem.send_keys(Keys.RETURN)
+time.sleep(2)
+
+
+followee = [] 
+follower = []
+
+for i in range(len(name)):
+    link = 'https://twitter.com/' + name[i]
+    driver.get(link)
+    driver.implicitly_wait(3)
+    try:
+        wee = driver.find_element_by_xpath("//span[descendant::span[text()='Following']]/preceding-sibling::span/span").text
+        wer = driver.find_element_by_xpath("//span[descendant::span[text()='Followers']]/preceding-sibling::span/span").text
+        followee.append(wee)
+        follower.append(wer)
+        time.sleep(3)
+
+    except Exception as e:
+        followee.append("None")
+        follower.append("None")
+        time.sleep(60*15)
+        continue
+    except StopIteration:
+        break
+        
+result = {'followee': followee, 'follower':follower}
+df = pd.DataFrame(result) 
+df.to_csv('followee.csv') #export your result
+
