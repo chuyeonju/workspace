@@ -1,0 +1,66 @@
+import pandas as pd
+
+
+df = pd.read_csv('../dataset/0318_followee+preprocessing.csv', encoding= "unicode_escape")
+
+#None으로 표시된 행 제거
+df1 = df[~df['followee'].str.contains("None", na=False, case=False)]
+
+followee_list = [i for i in df1.followee.values]
+follower_list = [i for i in df1.follower.values]
+
+
+#followee
+#followee values에 대해 K 제거 '# ,' 제거 # Convert data type(str to int)
+followee_k_list = []
+for i in followee_list:
+    if 'K' in i:
+        followee_k = i.replace('K', '') #K 제거
+        followee_k = (float(followee_k))*1000 # 숫자 변환
+        followee_k_list.append(followee_k)
+        
+    elif 'M' in i:
+        followee_m = i.replace('M', '') #m 제거
+        followee_m = (float(followee_m))*1000000 # 숫자 변환
+        followee_k_list.append(followee_m)    
+    
+    elif ',' in i:
+        followee_a = i.replace(',', '') #K 제거
+        followee_k_list.append(float(followee_a))        
+    else:
+        followee_k_list.append(float(i))
+        
+#print(len(followee_k_list)) #checking
+
+
+#follower # same as followee
+follower_k_list = []
+for i in follower_list:
+    if 'K' in i:
+        follower_k = i.replace('K', '') #K 제거
+        follower_k = (float(follower_k))*1000 # 숫자 변환
+        follower_k_list.append(follower_k)
+    elif 'M' in i:
+        follower_m = i.replace('M', '') #m 제거
+        follower_m = (float(follower_m))*1000000 # 숫자 변환
+        follower_k_list.append(follower_m)
+        
+    elif ',' in i:
+        follower_a = i.replace(',', '') #K 제거
+        follower_k_list.append(float(follower_a))        
+    else:
+        follower_k_list.append(float(i))
+
+# add the result as columns
+df1['follower_num'] = follower_k_list
+
+# df1.head(10) 
+
+# float to int
+df1.astype({'follower_num':'int64', 'followeee_num':'int64'}).dtypes
+
+print("변경 전:", len(df),"변경 후:",len(df1)) #check 
+
+# you can export
+df1.to_csv('preprocessing_followeee+follower.csv')
+df1['followeee_num'] = followee_k_list
